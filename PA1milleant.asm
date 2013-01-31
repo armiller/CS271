@@ -32,17 +32,24 @@ la	$a0, prompt1		#Load 1st prompt
 syscall				#Print first prompt
 
 li	$v0, 5			#Call system to obtain number
-li	$a1, 100		#Max number = 100
-la	$a0, num1		#Save entry to num1
+li	$a1, 100		#Max number = 10		
 syscall
-
+sw	$a0, num1		#save result to num2
 #---2nd prompt---#
 li	$v0, 4			#Call system to print string
 la	$a0, prompt2		#Load 2nd prompt
 syscall				#Print second prompt
 
 li	$v0, 5			#Call system to obtain number
-la	$a0, num2		#Save entry to num2
+syscall
+sw	$a0, num2		#save result to num2
+
+#--Compute Numbers-#
+la	$t1, num1
+la	$t2, num2
+add	$t0, $t1, $t2
+
+
 
 li	$v0, 10
 syscall
