@@ -14,7 +14,7 @@ num1:		.word 0
 num2:		.word 0
 
 sum:		.word 0
-differnce:	.word 0
+difference:	.word 0
 quotient:	.word 0
 remainder:	.word 0
 
@@ -32,24 +32,27 @@ la	$a0, prompt1		#Load 1st prompt
 syscall				#Print first prompt
 
 li	$v0, 5			#Call system to obtain number
-li	$a1, 100		#Max number = 10		
+li	$a1, 100		#Max number = 100		
 syscall
-sw	$a0, num1		#save result to num2
+move	$v0, $t0		#save result to num2
 #---2nd prompt---#
+la	$a0, prompt2
 li	$v0, 4			#Call system to print string
-la	$a0, prompt2		#Load 2nd prompt
 syscall				#Print second prompt
 
 li	$v0, 5			#Call system to obtain number
-syscall
-sw	$a0, num2		#save result to num2
+syscall		
+move	$v0, $t1		#save result to num2
 
 #--Compute Numbers-#
-la	$t1, num1
-la	$t2, num2
-add	$t0, $t1, $t2
+add	$t0, $t1, $t2		#Sum of two numbers
+sw	$t0, sum		#Store result in memory
 
+sub	$t0, $t1, $t2
+sw	$t0, difference
 
+mul	$t0, $t1, $t2
+sw	$t0, product
 
 li	$v0, 10
 syscall
