@@ -6,19 +6,21 @@
 
 greet: 		.ascii "\t\tComputation by Anthony Miller\n\n" 
        		.asciiz "This program takes two numbers and runs calcuations on them!\n\n"	
-       
 prompt1: 	.asciiz "Enter a number: "
 prompt2: 	.asciiz "Enter a second number: "
 
-num1:		.word 0
-num2:		.word 0
+equals:		.asciiz " = "
+plus:		.asciiz " + "
+minus:		.asciiz " - "
+divide:		.asciiz " / "
+leftover:	.asciiz " % "
+newline:	.asciiz "\n"
 
 sum:		.word 0
 difference:	.word 0
+product:	.word 0
 quotient:	.word 0
 remainder:	.word 0
-
-text:	.space 100
 
 .text 
 #-----greet------#
@@ -31,10 +33,10 @@ li	$v0, 4			#Call system to print string
 la	$a0, prompt1		#Load 1st prompt
 syscall				#Print first prompt
 
-li	$v0, 5			#Call system to obtain number
-li	$a1, 100		#Max number = 100		
+li	$v0, 5			#Call system to obtain number		
 syscall
-move	$v0, $t0		#save result to num2
+move	$t1, $v0		#Move number to t0 register
+
 #---2nd prompt---#
 la	$a0, prompt2
 li	$v0, 4			#Call system to print string
@@ -42,17 +44,54 @@ syscall				#Print second prompt
 
 li	$v0, 5			#Call system to obtain number
 syscall		
-move	$v0, $t1		#save result to num2
+move	$t2, $v0		#Move number to t0 resgister
+
 
 #--Compute Numbers-#
-add	$t0, $t1, $t2		#Sum of two numbers
-sw	$t0, sum		#Store result in memory
+add	$t5, $t1, $t2		#Sum of two numbers
+sw	$t5, sum		#Store result in memory
 
-sub	$t0, $t1, $t2
-sw	$t0, difference
+sub	$t6, $t1, $t2		#difference between two numbers
+sw	$t6, difference		#store result in memory
 
-mul	$t0, $t1, $t2
-sw	$t0, product
+mul	$t7, $t1, $t2		#mulitply two numbers
+sw	$t7, product		#store result in memory
+
+div	$t1, $t2		#divide numbers 
+mflo	$t3			#Move quotient into t3
+mfhi	$t4			#Move remainder into t4
+sw	$t3, quotient		#Store quotient in memory
+sw	$t4, remainder		#Store remainder in memory
+
+#---Print Output---#
+li	$v0, 4			#
+la	$a0, newline		#New line
+syscall				#
+
+li	$v0, 1			#
+move	$a0, $t1		#
+syscall 			#
+
+la	$a0, plus		#
+li	$v0, 4			#Print out Sum of two numbers.
+syscall				#
+
+li	$v0, 1			#
+move	$a0, $t2		#
+syscall				#
+
+la	$a0, equals		#
+li	$v0, 4			#
+syscall				#
+
+li	$v0, 1			#
+la	$a0, sum		#
+
+
+
+
+
+
 
 li	$v0, 10
 syscall
