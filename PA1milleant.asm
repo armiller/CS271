@@ -27,18 +27,22 @@ la	$a0, greet		#Load the Greet statment
 syscall				#Print the Greet
 
 #---1 prompt-----#
-li	$v0, 4			#call system to print string
+li	$v0, 4			#Call system to print string
 la	$a0, prompt1		#Load 1st prompt
 syscall				#Print first prompt
 
-li	$v0, 8			#Call system to obtain number
-li	$a1, 100		#max number = 100
-la	$a0, num1		#save entry to num1
+li	$v0, 5			#Call system to obtain number
+li	$a1, 100		#Max number = 100
+la	$a0, num1		#Save entry to num1
 syscall
 
-li	$v0, 4
-la	$a0, num1
-syscall
+#---2nd prompt---#
+li	$v0, 4			#Call system to print string
+la	$a0, prompt2		#Load 2nd prompt
+syscall				#Print second prompt
+
+li	$v0, 5			#Call system to obtain number
+la	$a0, num2		#Save entry to num2
 
 li	$v0, 10
 syscall
