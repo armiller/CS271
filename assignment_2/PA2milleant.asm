@@ -26,10 +26,13 @@ la      $a0, greet      #Load greet string
 syscall                 #Print string
 
 #-------Get Name------------#
+
+#"Please enter your name: "
 li      $v0, 4          #Prepare system to print string
 la      $a0, getname    #Load get name string
 syscall                 #Print string
 
+#get_name()
 li      $v0, 8          #Prepare system to read string
 li      $a1, 64         #Maximum string size
 la      $a0, name       #Store name into memory
@@ -49,15 +52,34 @@ syscall                 #print name
 
 #------Get Number-----------#
 
-#"How many numbers do you want to see?"
-li      $v0, 4          #Prepare system to print string
-la      $a0, getnumber  #Load getnumber string
-syscall                 #Print string
+#Loop: 
+#   While (n < 1 && n > 47) {
+#   
+#       printf("Not a valid number. Must be within 1-47");
+#       n = get_int();
+#
+#    }
+#
+#   Continue...    
+#
 
-#"Get number()" 
-li      $v0, 5          #Prepare system to read Int
-syscall                 #Collect Int from user
-sw      $v0, n          #Store number to memory 
+notvalid:   
+            #"How many numbers do you want to see?"
+            li      $v0, 4          #Prepare system to print string
+            la      $a0, getnumber  #Load getnumber string
+            syscall                 #Print string
+
+            #get_number() 
+            li      $v0, 5          #Prepare system to read Int
+            syscall                 #Collect Int from user
+            sw      $v0, n          #Store number to memory 
+
+
+
+
+
+valid:
+
 
 
 
