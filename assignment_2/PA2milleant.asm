@@ -5,10 +5,10 @@
 
 .data
 
-greet:      .ascii      "\tFibinnoci numbers: By Anthony Miller\n\n"
-            .asciiz     "\tThis program outpus fibinoccie numbers!\n"
+greet:      .ascii      "\tFibinnoci numbers\n\n\tBy: Anthony Miller\n\n"
+            .asciiz     "This program outpus fibinoccie numbers!\n"
 
-getnumber:  .asciiz     "How many fiboniacci numbers do you want to see?: "
+getnumber:  .asciiz     "\nHow many fiboniacci numbers do you want to see?: "
 getname:    .asciiz     "\nPlease enter your name: "
 
 newline:    .asciiz     "\n"
@@ -25,6 +25,15 @@ syscall                 #Print string
 
 li      $v0, 4          #Prepare system to print string
 la      $a0, getname    #Load get name string
+syscall                 #Print string
+
+li      $v0, 8          #Prepare system to read string
+li      $a1, 100        #Maximum string size
+la      $a0, name       #Store name into memory
+syscall                 #Get name
+
+li      $v0, 4          #Prepare system to print string
+la      $a0, getnumber  #Load getnumber string
 syscall                 #Print string
 
 li      $v0, 5          #Prepare system to read Int
