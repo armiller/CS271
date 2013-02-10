@@ -14,6 +14,9 @@ getname:    .asciiz     "\nPlease enter your name: "
 
 notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47"
 
+conclusion: .asciiz     "There you go! Have a good day, "
+spaces:     .asciiz     "    "
+
 newline:    .asciiz     "\n"
 
 name:       .space      64  
@@ -115,14 +118,64 @@ endloop:
 #   for(i; i < n; i++) {
 #
 #       tmp = firstnum + secondnum;
-#       printf("%d   " , firstnum + secondnum);
+#       printf("%d   " , tmp);
 #       firstnum = secondnum;
 #       secondnum = tmp;
 #
 #    }
 #
-#
-#
+
+li      $t0, 1  # i = $t0; $t0 = 1
+la      $t1, n  # $t1 = n 
+li      $t3, 0  # firstnum $t3 = 0
+li      $t4, 0  # secondnum $t4 = 0
+li      $t5, 0  # tmp; $t5 = 0 
+
+forloop:
+        
+        bgt     $t0, $t1, endfor    #if(n > i) loop
+
+        add     $t5, $t3, $t4   #tmp = firstnum + secondnum
+        
+        #---------Print number-----------#
+        li      $v0, 1          #printf()
+        move    $a0, $t5        #"%d" = tmp
+        syscall                 #Print tmp
+        
+        #---------Print 4 spaces---------#
+
+        li      $v0, 4          #printf()
+        la      $a0, spaces     #print 4 spaces
+        syscall                 #print
+
+        #---------move numbers-----------#
+        
+        move    $t3, $t4        # firstnum = secondnum
+        move    $t4, $t5        # secondnum = tmp
+
+        addi    $t0, $t0,  1          #i++
+
+        j   forloop             #loop
+
+
+endfor:
+
+##############################################
+#               Section 4                    #
+##############################################
+
+#----------Print conlusion---------#
+
+li      $v0, 4          #Prepare system to print string
+la      $a0, conclusion #Load conlusion string
+syscall
+
+#---------Print name---------------#
+li      $v0, 4          #prepare system to print name
+la      $a0, name       #Load nam
+syscall                 
+
+
 
 li      $v0, 10         #Prepare system to exit
 syscall                 #Exit
