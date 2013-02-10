@@ -21,6 +21,10 @@ name:       .space      64
 n:          .word       0
 
 .text
+#########################################
+#               Section 1               #
+#########################################
+
 #--------Greet---------------#
 
 li      $v0, 4          #Prepare system to print string
@@ -51,6 +55,10 @@ syscall                 #Print
 li      $v0, 4          #Prepare system to print string
 la      $a0, name       #Load user name
 syscall                 #print name
+
+#########################################
+#               Section 2               #
+#########################################
 
 #------Get Number-----------#
 
@@ -89,13 +97,22 @@ nvalid:
 
             j       getNumLoop          #Go back to num loop
 
-
+#Continue
 endloop:
+
+#########################################      
+#               Section 3               #
+#########################################
 
 #-------Computer Fibonacci numbers-------#
 
-
-
+#   for(i = $t0; i < n; i++) {
+#
+#
+#    }
+#
+#
+#
 
 li      $v0, 10         #Prepare system to exit
 syscall                 #Exit
