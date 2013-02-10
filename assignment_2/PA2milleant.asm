@@ -85,8 +85,8 @@ getNumLoop:
             sw      $v0, n              #Store number to memory 
             move    $t0, $v0            #Move number to get ready for if statement
 
-            blez    $t0, nvalid       # if (n <= 0 ) goto notvalid label
-            bgt     $t0, 47, nvalid   # if (n > 47) goto notvalid label 
+            blez    $t0, nvalid         # if (n <= 0 ) goto notvalid label
+            bgt     $t0, 47, nvalid     # if (n > 47) goto notvalid label 
             j       endloop             # goto end if (n > 0 && n < 47)
 nvalid:   
             
@@ -104,10 +104,20 @@ endloop:
 #               Section 3               #
 #########################################
 
-#-------Computer Fibonacci numbers-------#
+#-------Compute Fibonacci numbers-------#
 
-#   for(i = $t0; i < n; i++) {
+#   i = $t0; $t0 = 0
+#   n = $t1;
+#   firstnum = $t3
+#   secondnum = $t4
+#   tmp = $t5
 #
+#   for(i; i < n; i++) {
+#
+#       tmp = firstnum + secondnum;
+#       printf("%d   " , firstnum + secondnum);
+#       firstnum = secondnum;
+#       secondnum = tmp;
 #
 #    }
 #
