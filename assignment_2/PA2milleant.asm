@@ -8,7 +8,7 @@
 greet:      .ascii      "\tFibinnoci numbers\n\n\tBy: Anthony Miller\n\n"
             .asciiz     "This program outpus fibinoccie numbers!\n"
 
-greetintro: .asciiz     "Hello " 
+greetintro: .asciiz     "\nHello " 
 getnumber:  .asciiz     "\nHow many fiboniacci numbers do you want to see?: "
 getname:    .asciiz     "\nPlease enter your name: "
 
@@ -16,6 +16,7 @@ notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47"
 
 conclusion: .asciiz     "There you go! Have a good day, "
 spaces:     .asciiz     "    "
+exclamation:.asciiz     "!"
 
 newline:    .asciiz     "\n"
 
@@ -58,6 +59,11 @@ syscall                 #Print
 li      $v0, 4          #Prepare system to print string
 la      $a0, name       #Load user name
 syscall                 #print name
+
+#"!"
+li      $v0, 4          #!
+la      $a0, exclamation#load !
+syscall
 
 #########################################
 #               Section 2               #
@@ -134,19 +140,42 @@ lw      $t1, n  # $t1 = n
 li      $t3, 0  # firstnum $t3 = 0
 li      $t4, 1  # secondnum $t4 = 0
 li      $t5, 0  # tmp; $t5 = 0 
+li      $t6, 0  # counter = 0
 
 #---------Print zero---------------#
-li      $v0, 1  #printint()
-li      $a0, 0  #print zero
+
+li      $v0, 1              #printint()
+li      $a0, 0              #print zero
 syscall
 
-addi    $t0, $t0, 1 #increment one to make up for 0
+li      $v0, 4              #Print string
+la      $a0, spaces         #Print newline
+syscall
+
+addi    $t0, $t0, 1         #i++
+addi     $t6, $t6, 1         #counter++
+
+#--------Print 1--------------------#
+bgt     $t0, $t1, endfor    #if (i >= n) end.  
+li      $v0, 1              #Printint()
+li      $a0, 1              #Print 1
+syscall
+
+li      $v0, 4              #Print string
+la      $a0, spaces         #Print newline
+syscall
+
+
+addi    $t0, $t0, 1         #i++
+addi    $t6, $t6, 1         #counter++
 
 forloop:
         
         bgt     $t0, $t1, endfor    #if(n > i) loop
 
-        add     $t5, $t3, $t4   #tmp = firstnum + secondnum
+        bge     $t6, 5, fiveline    #if(i >= 5) print newline
+
+        add     $t5, $t3, $t4       #tmp = firstnum + secondnum
         
         #---------Print number-----------#
         li      $v0, 1          #printf()
@@ -164,7 +193,8 @@ forloop:
         move    $t3, $t4        # firstnum = secondnum
         move    $t4, $t5        # secondnum = tmp
 
-        addi    $t0, $t0,  1          #i++
+        addi    $t0, $t0, 1    #i++
+        addi    $t6, $t6, 1     #counter++
 
         j   forloop             #loop
 
@@ -174,7 +204,10 @@ fiveline:
         li      $v0, 4      
         la      $a0, newline
         syscall
-
+        
+        li      $t6, 0          #reset newline counter
+        
+        j   forloop
 
 endfor:
 
@@ -183,6 +216,9 @@ endfor:
 ##############################################
 
 #----------Print conlusion---------#
+li      $v0, 4          #
+la      $a0, newline    #New line
+syscall                 #
 
 li      $v0, 4          #Prepare system to print string
 la      $a0, conclusion #Load conlusion string
@@ -193,7 +229,6 @@ li      $v0, 4          #prepare system to print name
 la      $a0, name       #Load nam
 syscall                 
 
-
-
+#---------Exit----------#
 li      $v0, 10         #Prepare system to exit
 syscall                 #Exit
