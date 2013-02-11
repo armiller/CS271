@@ -114,8 +114,13 @@ endloop:
 #   firstnum = $t3
 #   secondnum = $t4
 #   tmp = $t5
+#   counter = 0
 #
 #   for(i; i < n; i++) {
+#
+#       if(counter == 5) {
+#           printf("\n");
+#       {
 #
 #       tmp = firstnum + secondnum;
 #       printf("%d   " , tmp);
@@ -123,13 +128,19 @@ endloop:
 #       secondnum = tmp;
 #
 #    }
-#
 
 li      $t0, 1  # i = $t0; $t0 = 1
-la      $t1, n  # $t1 = n 
+lw      $t1, n  # $t1 = n 
 li      $t3, 0  # firstnum $t3 = 0
-li      $t4, 0  # secondnum $t4 = 0
+li      $t4, 1  # secondnum $t4 = 0
 li      $t5, 0  # tmp; $t5 = 0 
+
+#---------Print zero---------------#
+li      $v0, 1  #printint()
+li      $a0, 0  #print zero
+syscall
+
+addi    $t0, $t0, 1 #increment one to make up for 0
 
 forloop:
         
@@ -156,6 +167,13 @@ forloop:
         addi    $t0, $t0,  1          #i++
 
         j   forloop             #loop
+
+fiveline:
+        
+        #------Print new line------------#
+        li      $v0, 4      
+        la      $a0, newline
+        syscall
 
 
 endfor:
