@@ -17,6 +17,8 @@ notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47\n"
 conclusion: .asciiz     "\n\nThere you go! Have a good day, "
 spaces:     .asciiz     "    "
 
+numzero:    .asciiz     "0    "
+numone:     .asciiz     "1    "
 newline:    .asciiz     "\n"
 
 name:       .space      64  
@@ -138,12 +140,8 @@ li      $t6, 0  # counter = 0
 
 #---------Print zero---------------#
 
-li      $v0, 1              #printint()
-li      $a0, 0              #print zero
-syscall
-
-li      $v0, 4              #Print string
-la      $a0, spaces         #Print newline
+li      $v0, 4              #print string "0    "
+la      $a0, numzero        #print zero
 syscall
 
 addi    $t0, $t0, 1         #i++
@@ -151,14 +149,9 @@ addi     $t6, $t6, 1         #counter++
 
 #--------Print 1--------------------#
 bgt     $t0, $t1, endfor    #if (i >= n) end.  
-li      $v0, 1              #Printint()
-li      $a0, 1              #Print 1
+li      $v0, 4              #Print string "1    "
+la      $a0, numone         #Print 1
 syscall
-
-li      $v0, 4              #Print string
-la      $a0, spaces         #Print newline
-syscall
-
 
 addi    $t0, $t0, 1         #i++
 addi    $t6, $t6, 1         #counter++
