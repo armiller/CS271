@@ -17,7 +17,7 @@ notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47\n"
 conclusion: .asciiz     "\n\nThere you go! Have a good day, "
 spaces:     .asciiz     "    "
 
-numzero:    .asciiz     "0    "
+numzero:    .asciiz     "\n0    "
 numone:     .asciiz     "1    "
 newline:    .asciiz     "\n"
 
