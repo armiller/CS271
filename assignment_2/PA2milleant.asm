@@ -12,9 +12,9 @@ greetintro: .asciiz     "\nHello "
 getnumber:  .asciiz     "\nHow many fiboniacci numbers do you want to see?: "
 getname:    .asciiz     "\nPlease enter your name: "
 
-notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47"
+notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47\n"
 
-conclusion: .asciiz     "There you go! Have a good day, "
+conclusion: .asciiz     "\n\nThere you go! Have a good day, "
 spaces:     .asciiz     "    "
 exclamation:.asciiz     "!"
 
@@ -216,10 +216,6 @@ endfor:
 ##############################################
 
 #----------Print conlusion---------#
-li      $v0, 4          #
-la      $a0, newline    #New line
-syscall                 #
-
 li      $v0, 4          #Prepare system to print string
 la      $a0, conclusion #Load conlusion string
 syscall
