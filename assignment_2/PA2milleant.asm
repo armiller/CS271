@@ -8,7 +8,7 @@
 greet:      .ascii      "\tFibinnoci numbers\n\n\tBy: Anthony Miller\n\n"
             .asciiz     "This program outpus fibinoccie numbers!\n"
 
-greetintro: .asciiz     "\nHello " 
+greetintro: .asciiz     "\nHello, " 
 getnumber:  .asciiz     "\nHow many fiboniacci numbers do you want to see?: "
 getname:    .asciiz     "\nPlease enter your name: "
 
@@ -16,7 +16,6 @@ notvalid:   .asciiz     "\nNumber is invalid, must be between 1-47\n"
 
 conclusion: .asciiz     "\n\nThere you go! Have a good day, "
 spaces:     .asciiz     "    "
-exclamation:.asciiz     "!"
 
 newline:    .asciiz     "\n"
 
@@ -59,11 +58,6 @@ syscall                 #Print
 li      $v0, 4          #Prepare system to print string
 la      $a0, name       #Load user name
 syscall                 #print name
-
-#"!"
-li      $v0, 4          #!
-la      $a0, exclamation#load !
-syscall
 
 #########################################
 #               Section 2               #
