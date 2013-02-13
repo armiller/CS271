@@ -6,7 +6,7 @@
 .data
 
 greet:      .ascii      "\tFibinnoci numbers\n\n\tBy: Anthony Miller\n\n"
-            .asciiz     "This program outpus fibinoccie numbers!\n"
+            .asciiz     "This program outputs fibinoccie numbers!\n"
 
 greetintro: .asciiz     "\nHello, " 
 getnumber:  .asciiz     "\nHow many fiboniacci numbers do you want to see?: "
