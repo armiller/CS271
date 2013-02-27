@@ -5,10 +5,13 @@
 
 .data
 
-intro:  .asciiz     "Letter Counter by, Anthony Miller\n"
+intro:      .asciiz     "\t\tLetter Counter by, Anthony Miller\n\nPlease enter a sentence: "
 
 sentence:   .space      1024
 
+alphabet:   .asciiz     "abcdefghijklmnopqrstuvwxyz" 
+
+freq:       .space      104         #26 integer array
 
 .text
 
@@ -30,9 +33,8 @@ sentence:   .space      1024
 main:
 
 jal     setup           #Print notice and collect sentence
-jal     analyze         #
-jal     count
-jal     results
+#jal     analyze         #
+#jal     results
 
 li      $v0, 10         #Exit
 syscall                 #
@@ -40,6 +42,14 @@ syscall                 #
 #############################
 #           Setup           #
 #############################
+#
+#void get_string(*sentence) {
+#
+#   printf("Letter Counter, by Anthony Miller\n");
+#   sentence = scanf();
+#
+#   return;
+#}
 setup:
 
 #--------intro----------#
@@ -49,14 +59,65 @@ syscall                 #
 
 #-------get name--------#
 li      $v0, 8          #
+li      $a1, 1024       #Size of input
+la      $a0, sentence   #Store sentence to memory
 syscall                 #Collect sentence
-sw      $v0, sentence   #Store to memory
 
 jr      $ra             #return
 
 #############################
 #           Analyze         #
 #############################
+#
+#void analyze(char[] input, char[] alphabet) {
+#
+#   char current;
+#
+#   for(int i = 0; i < 26; i++) {
+#
+#       current = input[i];
+#       count(input[], current);
+#   }
+#}
+#   current = $t0
+#   i = $t1
+analyze:
+
+li      $t1, 0 #i = 0
+
+forloop:
+
+bge     $t1, 26, endfor # i < 26
+
+lb      $t0, $t1(sentence)        #current = input[i] 
+
+#------prolouge-------#
+addiu   $sp, -32        #push stack frame of 8 words
+
+move    $a0, $t0        #count(current);
+sw      16($sp), $t1    #save i 
+sw      14($sp), $ra    #save $ra
+
+jal     count           #count()
+
+#-----epilogue--------#
+lw      $t1, 16($sp)    #get i
+lw      $ra, 14($sp)    #get $ra
+
+addiu   $sp, 32         #pop stack
+
+addi    $t1, $t1, 1     #i++
+
+endfor:
+
+jr      $ra     #return
+
+###############################
+#           Count             #
+###############################
+
+
+
 
 
 
