@@ -76,7 +76,7 @@ jr      $ra             #return
 #   for(int i = 0; i < 26; i++) {
 #
 #       current = input[i];
-#       count(input[], current);
+#       freq[i] = count(input[], current);
 #   }
 #}
 #   current = $t0
@@ -106,6 +106,8 @@ lw      $ra, 14($sp)    #get $ra
 
 addiu   $sp, 32         #pop stack
 
+sw      (freq)$t1, $v0  #freq[i] = count();
+
 addi    $t1, $t1, 1     #i++
 
 endfor:
@@ -115,7 +117,6 @@ jr      $ra     #return
 ###############################
 #           Count             #
 ###############################
-
 
 
 
