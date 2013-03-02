@@ -75,7 +75,7 @@ jr      $ra             #return
 #
 #   for(int i = 0; i < 26; i++) {
 #
-#       current = input[i];
+#       current = alphabet[i];
 #       freq[i] = count(input[], current);
 #   }
 #}
@@ -87,36 +87,69 @@ li      $t1, 0 #i = 0
 
 forloop:
 
-bge     $t1, 26, endfor # i < 26
+bge     $t1, 26, endfor         # i < 26
 
-lb      $t0, $t1(sentence)        #current = input[i] 
+lb      $t0, $t1(alphabet)      #current = input[i] 
 
 #------prolouge-------#
-addiu   $sp, -32        #push stack frame of 8 words
+addiu   $sp, -24                #push stack frame of 8 words
 
-move    $a0, $t0        #count(current);
-sw      16($sp), $t1    #save i 
-sw      14($sp), $ra    #save $ra
+move    $a0, $t0                #count(current);
+sw      20($sp), $t1            #save i 
+sw      16($sp), $ra            #save $ra
 
-jal     count           #count()
+jal     count                   #count()
 
 #-----epilogue--------#
-lw      $t1, 16($sp)    #get i
-lw      $ra, 14($sp)    #get $ra
+lw      $t1, 20($sp)            #get i
+lw      $ra, 16($sp)            #get $ra
 
-addiu   $sp, 32         #pop stack
+addiu   $sp, 24                 #pop stack
 
-sw      (freq)$t1, $v0  #freq[i] = count();
+sw      (freq)$t1, $v0          #freq[i] = count();
 
-addi    $t1, $t1, 1     #i++
+addi    $t1, $t1, 1             #i++
 
 endfor:
 
-jr      $ra     #return
+jr      $ra                     #return
 
 ###############################
 #           Count             #
 ###############################
+#
+#    i = $t3
+#    counter = $t4 
+#
+#int count(char input, char[] string) {   
+#
+#   while(string[i] != "\0") {
+#
+#       if(string[i] == input) {
+#
+#           counter++;
+#
+#        i++;
+#
+#   return counter;
+#}
+li          $t3, 0        # i = $t3
+li          $t4, 0        # counter = $t4
+
+whileloop:
+
+beqz        (sentence)$t3, endwhile   #While(string[i] != "\0")
+
+beq         (sentence)$t3, $a0, thenbranch      #if(string[i] == input)
+addi        $a0, $a0,  
+
+
+
+
+
+
+
+thenbranch:
 
 
 
