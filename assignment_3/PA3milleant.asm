@@ -131,17 +131,14 @@ jr      $ra                     #return
 #
 #   return counter;
 #}
+
 #-----------callee proloug----------------#
 addiu		$sp, $sp, -24	#push stack
 sw			$ra, 20($sp)	#save
+#-----------------------------------------#
 
-
-
-li          $t3, 0        # i = $t3
-li          $t4, 0        # counter = $t4
-
-
-
+li          $t3, 0			# i = $t3
+li     		$v0, 0			# counter = $v0
 
 whileloop:
 
@@ -155,15 +152,26 @@ addi		$t3, $t3, 1							#i++
 
 thenbranch:
 
-addi		$t4(freq), $t4(freq), 1				#counter++
+addi		$v0, $v0, 1							#counter++
 
 j			whileloop							#loop
 
 endwhile:
 
-
-
+#------------Callee outro------------------#
+lw			$ra, 20($sp)		#load ra
+addiu		$sp, $sp, 24
+#------------------------------------------#
 jr			$ra									#return			
+
+
+#####################################
+#			Results					#
+#####################################
+
+
+
+
 
 
 
