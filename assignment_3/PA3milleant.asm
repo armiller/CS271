@@ -96,11 +96,13 @@ addiu   $sp, -24                #push stack frame of 8 words
 
 move    $a0, $t0                #count(current);
 sw      20($sp), $t1            #save i 
+sw		24($sp), $ra			#save ra
 
 jal     count                   #count()
 
 #-----epilogue--------#
 lw      $t1, 20($sp)            #get i
+lw		$ra	 24($sp)			#get ra
 
 addiu   $sp, 24                 #pop stack
 
@@ -168,15 +170,35 @@ jr			$ra									#return
 #####################################
 #			Results					#
 #####################################
+#
+#	void analyze(char[] freq, char[] alphabet) {
+#	
+#		for(int i = 0; i < 26; i++) {
+#	
+#			printf("%c: ", alphabet[i]);
+#			printf("%d\n", freq[i]);
+#		}	
+#	}
+#
+#	i = $t5
+results:
+
+li		$t5, $t5, 0					#i = 0
+
+resultfor:
+
+blt		$t5, 26, resultend			# (i < 26)
+
+#-----print "letter"---------#
+li		$v0, 8						#
+lb		$a0, $t5(alphabet)			# printf("%c: ", alphabet[i]);
+syscall
 
 
 
+resultend:
 
-
-
-
-
-
+jr			$ra
 
 
 
