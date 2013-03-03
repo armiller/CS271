@@ -9,6 +9,8 @@ intro:      .asciiz     "\t\tLetter Counter by, Anthony Miller\n\nPlease enter a
 
 sentence:   .space      1024
 
+colon:      .asciiz     ": "
+
 alphabet:   .asciiz     "abcdefghijklmnopqrstuvwxyz" 
 
 freq:       .space      104         #26 integer array
@@ -33,8 +35,8 @@ freq:       .space      104         #26 integer array
 main:
 
 jal     setup           #Print notice and collect sentence
-#jal     analyze         #
-#jal     results
+jal     analyze         #
+jal     results
 
 li      $v0, 10         #Exit
 syscall                 #
@@ -81,34 +83,37 @@ jr      $ra             #return
 #}
 #   current = $t0
 #   i = $t1
+#   wordcount = $t2
 analyze:
 
 li      $t1, 0 #i = 0
+li      $t2, 0 #wordcount = 0
 
 forloop:
 
 bge     $t1, 26, endfor         # i < 26
 
-lb      $t0, $t1(alphabet)      #current = input[i] 
+lb      $t0, alphabet($t1)      #current = input[i] 
 
 #------prolouge-------#
-addiu   $sp, -24                #push stack frame of 8 words
+addiu   $sp, $sp, -24           #push stack frame of 8 words
 
 move    $a0, $t0                #count(current);
-sw      20($sp), $t1            #save i 
-sw		24($sp), $ra			#save ra
+sw      $t1, 20($sp)            #save i
+sw      $ra, 24($sp)            #save ra
 
 jal     count                   #count()
 
 #-----epilogue--------#
 lw      $t1, 20($sp)            #get i
-lw		$ra	 24($sp)			#get ra
+lw      $ra  24($sp)            #get ra
 
-addiu   $sp, 24                 #pop stack
+addiu   $sp, $sp, 24            #pop stack
 
-sw      (freq)$t1, $v0          #freq[i] = count();
+sw      $v0, freq($t2)          #freq[i] = count();
 
 addi    $t1, $t1, 1             #i++
+addi    $t2, $t2, 4             #word count + 4
 
 endfor:
 
@@ -133,38 +138,40 @@ jr      $ra                     #return
 #
 #   return counter;
 #}
+count:
 
 #-----------callee proloug----------------#
-addiu		$sp, $sp, -24	#push stack
-sw			$ra, 20($sp)	#save
+addiu       $sp, $sp, -24	#push stack
+sw          $ra, 20($sp)	#save
 #-----------------------------------------#
 
-li          $t3, 0			# i = $t3
-li     		$v0, 0			# counter = $v0
+li          $t3, 0          # i = $t3
+li          $v0, 0          # counter = $v0
 
 whileloop:
 
-beqz        (sentence)$t3, endwhile   			#While(string[i] != "\0")
+lb          $t3, sentence($t3)                  #string[i]                                
+beqz        $t3, endwhile                       #While(string[i] != "\0")
 
-beq         (sentence)$t3, $a0, thenbranch      #if(string[i] == input)
+beq         $t3, $a0, thenbranch                #if(string[i] == input)
 addiu       $a0, $a0, -32						# A || a  
-beq 		(sentence)$t3, $a0, thenbranch		#if(string[i] == input - 32)
+beq         $t3, $a0, thenbranch                #if(string[i] == input - 32)
 
-addi		$t3, $t3, 1							#i++
+addi        $t3, $t3, 1                         #i++
 
 thenbranch:
 
-addi		$v0, $v0, 1							#counter++
+addi		$v0, $v0, 1                         #counter++
 
-j			whileloop							#loop
+j           whileloop                           #loop
 
 endwhile:
 
 #------------Callee outro------------------#
-lw			$ra, 20($sp)		#load ra
+lw          $ra, 20($sp)                        #load ra
 addiu		$sp, $sp, 24
 #------------------------------------------#
-jr			$ra									#return			
+jr          $ra                                 #return			
 
 
 #####################################
@@ -183,18 +190,27 @@ jr			$ra									#return
 #	i = $t5
 results:
 
-li		$t5, $t5, 0					#i = 0
+li		$t5, 0                      #i = 0
 
 resultfor:
 
 blt		$t5, 26, resultend			# (i < 26)
 
 #-----print "letter"---------#
-li		$v0, 8						#
-lb		$a0, $t5(alphabet)			# printf("%c: ", alphabet[i]);
+li		$v0, 4						#
+lb		$a0, alphabet($t5)			# printf("%c: ", alphabet[i]);
 syscall
 
+#-----print ": "--------------#
+li		$v0, 4
+la		$a0, colon
+syscall
 
+#------print number-----------#
+li		$v0, 1
+la		$a0, freq($t5)				# printf("%d\n", freq[i]); 
+
+j		resultfor					#loop
 
 resultend:
 
