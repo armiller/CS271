@@ -96,13 +96,11 @@ addiu   $sp, -24                #push stack frame of 8 words
 
 move    $a0, $t0                #count(current);
 sw      20($sp), $t1            #save i 
-sw      16($sp), $ra            #save $ra
 
 jal     count                   #count()
 
 #-----epilogue--------#
 lw      $t1, 20($sp)            #get i
-lw      $ra, 16($sp)            #get $ra
 
 addiu   $sp, 24                 #pop stack
 
@@ -125,7 +123,7 @@ jr      $ra                     #return
 #
 #   while(string[i] != "\0") {
 #
-#       if(string[i] == input) {
+#       if(string[i] == input || string[i] == input - 32) {
 #
 #           counter++;
 #
@@ -133,23 +131,42 @@ jr      $ra                     #return
 #
 #   return counter;
 #}
+#-----------callee proloug----------------#
+addiu		$sp, $sp, -24	#push stack
+sw			$ra, 20($sp)	#save
+
+
+
 li          $t3, 0        # i = $t3
 li          $t4, 0        # counter = $t4
 
+
+
+
 whileloop:
 
-beqz        (sentence)$t3, endwhile   #While(string[i] != "\0")
+beqz        (sentence)$t3, endwhile   			#While(string[i] != "\0")
 
 beq         (sentence)$t3, $a0, thenbranch      #if(string[i] == input)
-addi        $a0, $a0,  
+addiu       $a0, $a0, -32						# A || a  
+beq 		(sentence)$t3, $a0, thenbranch		#if(string[i] == input - 32)
 
-
-
-
-
-
+addi		$t3, $t3, 1							#i++
 
 thenbranch:
+
+addi		$t4(freq), $t4(freq), 1				#counter++
+
+j			whileloop							#loop
+
+endwhile:
+
+
+
+jr			$ra									#return			
+
+
+
 
 
 
