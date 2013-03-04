@@ -121,8 +121,9 @@ jr      $ra                     #return
 #           Count             #
 ###############################
 #
-#    i = $t3
-#    counter = $t4 
+#   i = $t3
+#   counter = $t4 
+#   current = $t5
 #
 #int count(char input, char[] string) {   
 #
@@ -148,12 +149,12 @@ li          $v0, 0          # counter = $v0
 
 whileloop:
 
-lb          $t3, sentence($t3)                  #string[i]                                
+lb          $t5, sentence($t3)                  #string[i]                                
 beqz        $t3, endwhile                       #While(string[i] != "\0")
 
-beq         $t3, $a0, thenbranch                #if(string[i] == input)
+beq         $t5, $a0, thenbranch                #if(string[i] == input)
 addiu       $a0, $a0, -32						# A || a  
-beq         $t3, $a0, thenbranch                #if(string[i] == input - 32)
+beq         $t5, $a0, thenbranch                #if(string[i] == input - 32)
 
 addi        $t3, $t3, 1                         #i++
 
@@ -213,6 +214,3 @@ j		resultfor					#loop
 resultend:
 
 jr			$ra
-
-
-
