@@ -96,8 +96,6 @@ bge     $t1, 26, endfor         # i < 26
 lb      $t0, alphabet($t1)      #current = input[i] 
 
 #------prolouge-------#
-addiu   $sp, $sp, -24           #push stack frame of 8 words
-
 move    $a0, $t0                #count(current);
 sw      $t1, 20($sp)            #save i
 
@@ -106,9 +104,7 @@ jal     count                   #count()
 #-----epilogue--------#
 lw      $t1, 20($sp)            #get i
 
-addiu   $sp, $sp, 24            #pop stack
-
-sw      $v0, freq($t2)          #freq[i] = count();
+sb      $v0, freq($t2)          #freq[i] = count();
 
 addi    $t1, $t1, 1             #i++
 addi    $t2, $t2, 4             #word count + 4
