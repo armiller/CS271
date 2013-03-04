@@ -182,18 +182,18 @@ jr          $ra                                 #return
 #		}	
 #	}
 #
-#	i = $t5
+#	i = $t6
 results:
 
-li		$t5, 0                      #i = 0
+li		$t6, 0                      #i = 0
 
 resultfor:
 
-blt		$t5, 26, resultend			# (i < 26)
+blt		$t6, 26, resultend			# (i < 26)
 
 #-----print "letter"---------#
 li		$v0, 4						#
-lb		$a0, alphabet($t5)			# printf("%c: ", alphabet[i]);
+lb		$a0, alphabet($t6)			# printf("%c: ", alphabet[i]);
 syscall
 
 #-----print ": "--------------#
@@ -203,7 +203,7 @@ syscall
 
 #------print number-----------#
 li		$v0, 1
-la		$a0, freq($t5)				# printf("%d\n", freq[i]); 
+la		$a0, freq($t6)				# printf("%d\n", freq[i]); 
 
 j		resultfor					#loop
 
