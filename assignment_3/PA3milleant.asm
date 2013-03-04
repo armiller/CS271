@@ -100,13 +100,11 @@ addiu   $sp, $sp, -24           #push stack frame of 8 words
 
 move    $a0, $t0                #count(current);
 sw      $t1, 20($sp)            #save i
-sw      $ra, 24($sp)            #save ra
 
 jal     count                   #count()
 
 #-----epilogue--------#
 lw      $t1, 20($sp)            #get i
-lw      $ra  24($sp)            #get ra
 
 addiu   $sp, $sp, 24            #pop stack
 
