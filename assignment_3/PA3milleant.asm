@@ -5,15 +5,9 @@
 
 .data
 
-intro:      .asciiz     "\t\tLetter Counter by, Anthony Miller\n\nPlease enter a sentence: "
-
-sentence:   .space      1024
-
-colon:      .asciiz     ": "
-
-alphabet:   .asciiz     "abcdefghijklmnopqrstuvwxyz" 
-
-freq:       .space      104         #26 integer array
+intro:		.asciiz	"Letter Counter by, Anthony Miller\n\nPlease enter a sentence:"
+sentence:	.space 	1024
+freq:		.space 	104         #26 integer array
 
 .text
 
@@ -34,12 +28,12 @@ freq:       .space      104         #26 integer array
 #
 main:
 
-jal     setup           #Print notice and collect sentence
-jal     analyze         #
-jal     results
+	jal     setup           #Print notice and collect sentence
+	jal     analyze         #
+	jal     results
 
-li      $v0, 10         #Exit
-syscall                 #
+	li      $v0, 10         #Exit
+	syscall	                 #
 
 #############################
 #           Setup           #
@@ -54,18 +48,18 @@ syscall                 #
 #}
 setup:
 
-#--------intro----------#
-li      $v0, 4          #
-la      $a0, intro      #Print intro
-syscall                 #
+	#--------intro----------#
+	li      $v0, 4          #
+	la      $a0, intro      #Print intro
+	syscall                 #
 
-#-------get name--------#
-li      $v0, 8          #
-li      $a1, 1024       #Size of input
-la      $a0, sentence   #Store sentence to memory
-syscall                 #Collect sentence
+	#-------get name--------#
+	li      $v0, 8          #
+	li      $a1, 1024       #Size of input
+	la      $a0, sentence   #Store sentence to memory
+	syscall                 #Collect sentence
 
-jr      $ra             #return
+	jr      $ra             #return
 
 #############################
 #           Analyze         #
@@ -83,35 +77,40 @@ jr      $ra             #return
 #}
 #   current = $t0
 #   i = $t1
-#   wordcount = $t2
+#   wordcount = $s1
 analyze:
 
-li      $t1, 0 #i = 0
-li      $t2, 0 #wordcount = 0
+	addiu   $sp, $sp, -24           #push stack
+	sw      $ra, 20($sp)            #save ra
+	li      $t1, 0			#i = 0
+	la	$s1, freq		#freq pointer
+	li      $t0, 'A'                #current = input[i] 
 
-forloop:
 
-bge     $t1, 26, endfor         # i < 26
+	forloop:
 
-lb      $t0, alphabet($t1)      #current = input[i] 
+	bge     $t1, 26, endfor         # i < 26
 
-#------prolouge-------#
-move    $a0, $t0                #count(current);
-sw      $t1, 20($sp)            #save i
+	#------prolouge-------#
+	move    $a0, $t0                #count(current);
 
-jal     count                   #count()
+	jal     count                   #count()
 
-#-----epilogue--------#
-lw      $t1, 20($sp)            #get i
+	#-----epilogue--------#
+	sw      $v0, 0($s1)             #freq[i] = return
 
-sb      $v0, freq($t2)          #freq[i] = count();
 
-addi    $t1, $t1, 1             #i++
-addi    $t2, $t2, 4             #word count + 4
+	addi    $t0, $t0, 1             #freq[i+1]
+	addi    $s1, $s1, 4             #word count + 4
+	addi    $t1, $t1, 1		#i++
 
-endfor:
+	j       forloop
 
-jr      $ra                     #return
+	endfor:
+
+	lw      $ra, 20($sp)            #get ra
+	addiu   $sp, $sp, 24            #pop stack
+	jr      $ra                     #return
 
 ###############################
 #           Count             #
@@ -120,6 +119,7 @@ jr      $ra                     #return
 #   i = $t3
 #   counter = $t4 
 #   current = $t5
+#   text = $t8
 #
 #int count(char input, char[] string) {   
 #
@@ -135,38 +135,34 @@ jr      $ra                     #return
 #}
 count:
 
-#-----------callee proloug----------------#
-addiu       $sp, $sp, -24	#push stack
-sw          $ra, 20($sp)	#save
-#-----------------------------------------#
+	li          $t4, 0          # counter = $t4
+	la          $t3, sentence
 
-li          $t3, 0          # i = $t3
-li          $v0, 0          # counter = $v0
+	whileloop:
 
-whileloop:
+	lb          $t5, 0($t3)                  	#string[i]                                
+	beqz        $t5, endwhile                       #While(string[i] != "\0")
 
-lb          $t5, sentence($t3)                  #string[i]                                
-beqz        $t3, endwhile                       #While(string[i] != "\0")
+	beq         $t5, $a0, thenbranch                #if(string[i] == input)
+	addi	    $t8, $a0, 32						# A || a  
+	beq         $t5, $t8, thenbranch                #if(string[i] == input - 32)
 
-beq         $t5, $a0, thenbranch                #if(string[i] == input)
-addiu       $a0, $a0, -32						# A || a  
-beq         $t5, $a0, thenbranch                #if(string[i] == input - 32)
+	addi        $t3, $t3, 1                         #i++
 
-addi        $t3, $t3, 1                         #i++
+	j           whileloop                           #loop
 
-thenbranch:
+	thenbranch:
 
-addi		$v0, $v0, 1                         #counter++
+	addi		$t4, $t4, 1                    	#counter++
+	addi        	$t3, $t3, 1                    	#i++
 
-j           whileloop                           #loop
+	j           whileloop                           #loop
 
-endwhile:
+	endwhile:
 
-#------------Callee outro------------------#
-lw          $ra, 20($sp)                        #load ra
-addiu		$sp, $sp, 24
-#------------------------------------------#
-jr          $ra                                 #return			
+	move        $v0, $t4
+
+	jr          $ra                                 #return			
 
 
 #####################################
@@ -185,28 +181,38 @@ jr          $ra                                 #return
 #	i = $t6
 results:
 
-li		$t6, 0                      #i = 0
+	la	$t6, freq			#i = 0
+	li      $t7, 'A'
 
-resultfor:
+	resultfor:
+	#-----print newline----------#
+	li		$v0, 11
+	li		$a0, '\n'
+	syscall
+	#-----print "letter"---------#		#
+	move		$a0, $t7        	# printf("%c: ", alphabet[i]);
+	syscall
 
-blt		$t6, 26, resultend			# (i < 26)
+	#-----print ": "--------------#
+	li		$a0, ':'
+	syscall
+	
+	#-----print space-------------#
+	li		$a0, ' '
+	syscall
 
-#-----print "letter"---------#
-li		$v0, 4						#
-lb		$a0, alphabet($t6)			# printf("%c: ", alphabet[i]);
-syscall
+	#------print number-----------#
+	li		$v0, 1
+	lw		$a0, 0($t6)		# printf("%d\n", freq[i]); 
+	syscall
 
-#-----print ": "--------------#
-li		$v0, 4
-la		$a0, colon
-syscall
+	addi    $t6, $t6, 4                 	#increment word
+	addi    $t7, $t7, 1                 	#i++
 
-#------print number-----------#
-li		$v0, 1
-la		$a0, freq($t6)				# printf("%d\n", freq[i]); 
+	beq     $t7, 'Z', resultend         	#(i == "z") break;
 
-j		resultfor					#loop
+	j	resultfor					#loop
 
-resultend:
+	resultend:
 
-jr			$ra
+	jr			$ra
