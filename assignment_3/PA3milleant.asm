@@ -1,5 +1,5 @@
 #Author:    Anthony Miller
-#Date:      February 22, 2012
+#Date:      March 6, 2012
 #Detail:    This program outputs the number of each letter that is 
 #           encountered in the input sentence.
 
@@ -53,7 +53,7 @@ setup:
 	la      $a0, intro      #Print intro
 	syscall                 #
 
-	#-------get name--------#
+	#-------get sentence----#
 	li      $v0, 8          #
 	li      $a1, 1024       #Size of input
 	la      $a0, sentence   #Store sentence to memory
@@ -75,12 +75,13 @@ setup:
 #       freq[i] = count(input[], current);
 #   }
 #}
-#   current = $t0
+#   freq = $s1
 #   i = $t1
-#   wordcount = $s1
+#   current = $t0
 analyze:
 
 	addiu   $sp, $sp, -24           #push stack
+	sw	$s1, 24($sp)		#save s1
 	sw      $ra, 20($sp)            #save ra
 	li      $t1, 0			#i = 0
 	la	$s1, freq		#freq pointer
@@ -107,7 +108,7 @@ analyze:
 	j       forloop
 
 	endfor:
-
+	lw	$s1, 24($sp)		#get s1
 	lw      $ra, 20($sp)            #get ra
 	addiu   $sp, $sp, 24            #pop stack
 	jr      $ra                     #return
@@ -119,7 +120,7 @@ analyze:
 #   i = $t3
 #   counter = $t4 
 #   current = $t5
-#   text = $t8
+#   temp = $t8
 #
 #int count(char input, char[] string) {   
 #
@@ -144,7 +145,7 @@ count:
 	beqz        $t5, endwhile                       #While(string[i] != "\0")
 
 	beq         $t5, $a0, thenbranch                #if(string[i] == input)
-	addi	    $t8, $a0, 32						# A || a  
+	addi	    $t8, $a0, 32			# A || a  
 	beq         $t5, $t8, thenbranch                #if(string[i] == input - 32)
 
 	addi        $t3, $t3, 1                         #i++
@@ -160,7 +161,7 @@ count:
 
 	endwhile:
 
-	move        $v0, $t4
+	move        $v0, $t4				#counter
 
 	jr          $ra                                 #return			
 
@@ -178,22 +179,23 @@ count:
 #		}	
 #	}
 #
-#	i = $t6
+#	freq[] = $t6
+#	i = $t7
 results:
 
-	la	$t6, freq			#i = 0
+	la	$t6, freq			#Load freq[] pointer
 	li      $t7, 'A'
 
 	resultfor:
-	#-----print newline----------#
+	#-----print newline-----------#
 	li		$v0, 11
 	li		$a0, '\n'
 	syscall
-	#-----print "letter"---------#		#
+	#-----print "letter"----------#		#
 	move		$a0, $t7        	# printf("%c: ", alphabet[i]);
 	syscall
 
-	#-----print ": "--------------#
+	#-----print ":"---------------#
 	li		$a0, ':'
 	syscall
 	
@@ -211,8 +213,8 @@ results:
 
 	beq     $t7, 'Z', resultend         	#(i == "z") break;
 
-	j	resultfor					#loop
+	j	resultfor			#loop
 
 	resultend:
 
-	jr			$ra
+	jr			$ra		#return
