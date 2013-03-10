@@ -15,7 +15,7 @@ time:		.asciiz "Time: "
 .align		2
 
 n:			.word	0
-
+fibs:
 
 .text
 
@@ -40,16 +40,18 @@ main:
 	la      $a0, greet      	#Load greet string
 	syscall                 	#Print string
 
-	jal		getN				#getn(int n);
+	jal		getN				#getN()
+	
+	la		$a0, fib			#first argument for testFib
+	lw		$a1, n				#second argument for testFib
+	
+	jal		testFib				#testFib(int n);
 
 	#------Print banner----------#
 	
 	li		$v0, 4				#
 	la		$a0, banner1		#Print first banner
 	syscall						#
-	
-	lw		$a0, n				#fib(n);
-	jal		fib					#
 
 	li		$v0, 10				#exit
 	syscall			
@@ -71,6 +73,7 @@ testFib:
 
 	addiu	$sp, $sp, -24		#push stack
 	sw		$ra, 20($sp)		#save ra
+	sw		$a1, 24($sp)		#save n
 
 	move	$t0, $a0			#save function pointer
 	
@@ -78,6 +81,8 @@ testFib:
 	syscall
 	
 	move 	$t1, $a0			#save time
+	
+	lw		$a0, 24($sp)		#get n
 	
 	jalr	$t0					#call function fib or fibm
 	
@@ -90,9 +95,24 @@ testFib:
 	
 	sub		$t5, $t2, $t1		#temp = time1 - time2
 	
-	li		$v0, 4	
+	li		$v0, 4				#
+	la		$a0, result			#Print "Result:"
+	syscall
 	
-
+	li		$v0, 1
+	la		$a0, n				#print return
+	syscall
+	
+	li		$v0, 4				#print "Time:"
+	la		$a0, time			
+	syscall
+	
+	li		$v0, 1
+	move	$a0, $t5			#print time
+	syscall
+	
+	lw		$ra, 20($sp)		#
+	jr		$ra				
 
 
 #####################
@@ -147,41 +167,38 @@ getN:
 #	n => $a0	 saved n => $s0		return => $s1
 #	
 fib:
-
+	
+	bge		$a0, 2, fibrecursive	#if n < 2, return 1
+	addi	$v0, $zero, 1			
+	jr		$ra						
+	
+	fibrecursive:
+	
 	#----stack frame-----#
 	addiu	$sp, $sp, -24		#push stack
-	sw		$s0, 16($sp)		#save $s0
-	sw		$s1, 20($sp)		#save $s1
+	sw		$a0, 0($sp)			#save $a0
 	sw		$ra, 24($sp)		#save $ra 
 	#--------------------#
 	
-	move	$s0, $a0			#save n
-	
-	ble		$a0, 2, fibthen		#if (n <= 2) return 1
-	
-	sub		$a0, $s0, 1			#prepare for fib(n-1)
+	sub		$a0, $a0, 1			#n-2
 	
 	jal		fib					#fib(n-1)
 	
-	add		$s1, $s1, $v0		#$s1 = fib(n-1)
+	sw		$v0, 16($sp)		#save return to stack
+	lw		$a0, 0($sp)			#restore n
 	
-	sub		$a0, $s0, 2			#prepare for fib(n-2)
+	sub		$a0, $a0, 2			#n-2
 	
 	jal		fib					#fib(n-2)
-	
-	add		$v0, $v0, $s1		#fib(n-1) + fib(n-2)
 
-	fibexit:
+	sw		$v0, 20($sp)		#save return from fib(n-2)
 	
 	#---stack frame-------#
-	lw		$s1, 20($sp)		#get $s1
-	lw		$s0, 16($sp)		#get $s0
+	lw		$t0, 16($sp)		#get $s1
+	lw		$t1, 20($sp)		#get $s0
 	lw		$ra, 24($sp)		#get $ra
 	addiu	$sp, $sp, 24		#push stack
+	
+	add		$v0, $t0, $t1		#fib(n-1) + fib(n-2)
+	
 	jr		$ra					#return
-	
-	fibthen:
-	
-	li		$v0, 1				#return 1
-	j		fibexit
-	
