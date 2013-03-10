@@ -6,9 +6,13 @@
 .data
 
 greet:		.asciiz	"Fibonacci computation Part two,\n\tby Anthony Miller\n"
-getnumber:	.asciiz	"\nEnter a number between [1-25]:"
+getnumber:	.asciiz	"\nEnter a number between [1-25]: "
 notvalid:	.asciiz	"\nNumber is invalid, must be between 1-25\n"
 banner1:	.asciiz	"\n== Purely Recursive =="
+result:		.asciiz "Result: "
+time:		.asciiz "Time: "
+
+.align		2
 
 n:			.word	0
 
@@ -54,14 +58,40 @@ main:
 #####################
 #		testFib		#
 #####################
+#
+#	void testFib(func* f, int n) {
+#		int temp1, temp2, answer;
+#		temp2start time();
+#		anser = fib(n)
+#		temp1 = stop time();
+#		printf("anser: %d, time: %d", f, time1-time2);
+#	}
+#	starttime => $t1	endtime => $t2		result => $t3
+testFib:
 
+	addiu	$sp, $sp, -24		#push stack
+	sw		$ra, 20($sp)		#save ra
 
-
-
-
-
-
-
+	move	$t0, $a0			#save function pointer
+	
+	li		$v0, 30				#start time
+	syscall
+	
+	move 	$t1, $a0			#save time
+	
+	jalr	$t0					#call function fib or fibm
+	
+	move	$t3, $v0			#save result
+	
+	li		$v0, 30				#stop time
+	syscall				
+	
+	move	$t2, $a0			#time
+	
+	sub		$t5, $t2, $t1		#temp = time1 - time2
+	
+	li		$v0, 4	
+	
 
 
 
@@ -144,10 +174,11 @@ fib:
 	fibexit:
 	
 	#---stack frame-------#
-	lw		$ra, 24($sp)		#get $ra
 	lw		$s1, 20($sp)		#get $s1
 	lw		$s0, 16($sp)		#get $s0
+	lw		$ra, 24($sp)		#get $ra
 	addiu	$sp, $sp, 24		#push stack
+	jr		$ra					#return
 	
 	fibthen:
 	
