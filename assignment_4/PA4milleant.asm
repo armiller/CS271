@@ -186,16 +186,14 @@ fib:
 
 	sw		$v0, 24($sp)		#save return from fib(n-2)
 	
-	#---stack frame-------#
-	lw		$t0, 20($sp)		#get fib(n-1)
-	lw		$t1, 24($sp)		#get fib(n-2)
-	addiu	$sp, $sp, 24		#push stack
-	
-	add		$v0, $t0, $t1		#fib(n-1) + fib(n-2)
+	add		$v0, $s0, $t1		#fib(n-1) + fib(n-2)
 
 fibend:
+	#---stack frame-------#
+	addiu	$sp, $sp, 24		#push stack
+	lw		$s0, 20($sp)		#get fib(n-1)
+	lw		$s1, 24($sp)		#get fib(n-2)
 	lw		$ra, 16($sp)		#get ra
-	addiu	$sp, $sp, 24		#pop stack
 	jr		$ra
 
 return1:
