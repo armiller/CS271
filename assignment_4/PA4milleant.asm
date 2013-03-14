@@ -164,38 +164,34 @@ getN:
 #	n => $a0	 saved n => $s0		return => $s1
 #	
 fib:
-	slti 	$t0, $a0, 2	# if i < 2 (i.e i == 1)
-	beq 	$t0, $zero, fibrecursive	# if i >= 2 go to cont
-	li		$v0, 1			
-	jr		$ra						
-	
-fibrecursive:
-	
 	#----stack frame-----#
 	addiu	$sp, $sp, -24		#push stack
-	sw		$a0, 0($sp)			#save $a0
-	sw		$ra, 20($sp)		#save $ra 
+	sw		$a0, 20($sp)		#save n
+	sw		$ra, 16($sp)		#save $ra 
 	#--------------------#
+	blt     $a0, 2, fibend      #if n <= 2 return 1;
 	
-	addi	$a0, $a0, -1		#n-2
+	sub 	$a0, $a0, 1			#n-2
 	
 	jal		fib					#fib(n-1)
 	
 	sw		$v0, 16($sp)		#save return to stack
-	lw		$a0, 0($sp)			#restore n
+	lw		$a0, 20($sp)		#restore n
 	
-	addiu	$a0, $a0, -2		#n-2
+	sub		$a0, $a0, 2			#n-2
 	
 	jal		fib					#fib(n-2)
 
 	sw		$v0, 24($sp)		#save return from fib(n-2)
 	
 	#---stack frame-------#
-	lw		$t0, 16($sp)		#get $s1
-	lw		$t1, 24($sp)		#get $s0
-	lw		$ra, 20($sp)		#get $ra
+	lw		$t0, 20($sp)		#get fib(n-1)
+	lw		$t1, 24($sp)		#get fib(n-2)
+	lw		$ra, 16($sp)		#get $ra
 	addiu	$sp, $sp, 24		#push stack
 	
 	add		$v0, $t0, $t1		#fib(n-1) + fib(n-2)
 	
 	jr		$ra					#return
+
+fibend:
