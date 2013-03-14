@@ -166,19 +166,21 @@ getN:
 fib:
 	#----stack frame-----#
 	addiu	$sp, $sp, -24		#push stack
-	sw		$a0, 20($sp)		#save n
+	sw		$s0, 20($sp)		#save n
+	sw		$s1, 24($sp)		#save 
 	sw		$ra, 16($sp)		#save $ra 
 	#--------------------#
-	blt     $a0, 2, fibend      #if n <= 2 return 1;
+
+	move 	$s0, $a0			#save n
+	beq     $a0, 2, return1     #if n <= 2 return 1;
 	
-	sub 	$a0, $a0, 1			#n-2
+	sub 	$a0, $s0, 1			#n-2
 	
 	jal		fib					#fib(n-1)
 	
 	sw		$v0, 16($sp)		#save return to stack
-	lw		$a0, 20($sp)		#restore n
 	
-	sub		$a0, $a0, 2			#n-2
+	sub		$a0, $s0, 2			#n-2
 	
 	jal		fib					#fib(n-2)
 
@@ -195,3 +197,8 @@ fibend:
 	lw		$ra, 16($sp)		#get ra
 	addiu	$sp, $sp, 24		#pop stack
 	jr		$ra
+
+return1:
+	li		$v0, 1
+	j		fibend
+
