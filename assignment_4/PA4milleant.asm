@@ -6,16 +6,13 @@
 .data
 
 greet:		.asciiz	"Fibonacci computation Part two,\n\tby Anthony Miller\n"
-getnumber:	.asciiz	"\nEnter a number between [1-25]: "
+getnumber:	.asciiz	"\nEnter a number between [1-25]:"
 notvalid:	.asciiz	"\nNumber is invalid, must be between 1-25\n"
 banner1:	.asciiz	"\n== Purely Recursive =="
-result:		.asciiz "Result: "
-time:		.asciiz "Time: "
-
-.align		2
+result:		.asciiz "Result:"
+time:		.asciiz "Time:"
 
 n:			.word	0
-fibs:
 
 .text
 
@@ -100,7 +97,7 @@ testFib:
 	syscall
 	
 	li		$v0, 1
-	la		$a0, n				#print return
+	move	$a0, $t3			#print return
 	syscall
 	
 	li		$v0, 4				#print "Time:"
@@ -167,36 +164,36 @@ getN:
 #	n => $a0	 saved n => $s0		return => $s1
 #	
 fib:
-	
-	bge		$a0, 2, fibrecursive	#if n < 2, return 1
+	slti 	$t0, $a0, 2	# if i < 2 (i.e i == 1)
+	beq 	$t0, $zero, fibrecursive	# if i >= 2 go to cont
 	addi	$v0, $zero, 1			
 	jr		$ra						
 	
-	fibrecursive:
+fibrecursive:
 	
 	#----stack frame-----#
 	addiu	$sp, $sp, -24		#push stack
 	sw		$a0, 0($sp)			#save $a0
-	sw		$ra, 24($sp)		#save $ra 
+	sw		$ra, 20($sp)		#save $ra 
 	#--------------------#
 	
-	sub		$a0, $a0, 1			#n-2
+	addi	$a0, $a0, -1		#n-2
 	
 	jal		fib					#fib(n-1)
 	
 	sw		$v0, 16($sp)		#save return to stack
 	lw		$a0, 0($sp)			#restore n
 	
-	sub		$a0, $a0, 2			#n-2
+	addiu	$a0, $a0, -2		#n-2
 	
 	jal		fib					#fib(n-2)
 
-	sw		$v0, 20($sp)		#save return from fib(n-2)
+	sw		$v0, 24($sp)		#save return from fib(n-2)
 	
 	#---stack frame-------#
 	lw		$t0, 16($sp)		#get $s1
-	lw		$t1, 20($sp)		#get $s0
-	lw		$ra, 24($sp)		#get $ra
+	lw		$t1, 24($sp)		#get $s0
+	lw		$ra, 20($sp)		#get $ra
 	addiu	$sp, $sp, 24		#push stack
 	
 	add		$v0, $t0, $t1		#fib(n-1) + fib(n-2)
