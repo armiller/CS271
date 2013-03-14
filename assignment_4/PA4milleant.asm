@@ -172,28 +172,26 @@ fib:
 	#--------------------#
 
 	move 	$s0, $a0			#save n
-	beq     $a0, 2, return1     #if n <= 2 return 1;
+	blt     $a0, 2, return1     #if n <= 2 return 1;
 	
 	sub 	$a0, $s0, 1			#n-2
 	
 	jal		fib					#fib(n-1)
 	
-	sw		$v0, 16($sp)		#save return to stack
+	move	$s1, $v0			#si = fib(n-1)
 	
 	sub		$a0, $s0, 2			#n-2
 	
 	jal		fib					#fib(n-2)
-
-	sw		$v0, 24($sp)		#save return from fib(n-2)
 	
-	add		$v0, $s0, $t1		#fib(n-1) + fib(n-2)
+	add		$v0, $v0, $s1		#fib(n-1) + fib(n-2)
 
 fibend:
 	#---stack frame-------#
-	addiu	$sp, $sp, 24		#push stack
 	lw		$s0, 20($sp)		#get fib(n-1)
 	lw		$s1, 24($sp)		#get fib(n-2)
 	lw		$ra, 16($sp)		#get ra
+	addiu	$sp, $sp, 24		#push stack
 	jr		$ra
 
 return1:
