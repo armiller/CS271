@@ -166,7 +166,7 @@ getN:
 fib:
 	slti 	$t0, $a0, 2	# if i < 2 (i.e i == 1)
 	beq 	$t0, $zero, fibrecursive	# if i >= 2 go to cont
-	addi	$v0, $zero, 1			
+	li		$v0, 1			
 	jr		$ra						
 	
 fibrecursive:
