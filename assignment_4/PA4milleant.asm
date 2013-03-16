@@ -6,13 +6,20 @@
 .data
 
 greet:		.asciiz	"Fibonacci computation Part two,\n\tby Anthony Miller\n"
-getnumber:	.asciiz	"\nEnter a number between [1-25]:"
+getnumber:	.asciiz	"\nEnter a number between [1-25]: "
 notvalid:	.asciiz	"\nNumber is invalid, must be between 1-25\n"
 banner1:	.asciiz	"\n== Purely Recursive =="
-result:		.asciiz "Result:"
-time:		.asciiz "Time:"
+banner2:	.asciiz "\n\n== With Memoization =="
+result:		.asciiz "\nResult: "
+time:		.asciiz "\nTime: "
+
+.align		2
 
 n:			.word	0
+
+memo:		.word	1
+			.word	1
+			.space	100
 
 .text
 
@@ -39,6 +46,13 @@ main:
 
 	jal		getN				#getN()
 	
+	
+	#------Print banner----------#
+	
+	li		$v0, 4				#
+	la		$a0, banner1		#Print first banner
+	syscall						#
+	
 	la		$a0, fib			#first argument for testFib
 	lw		$a1, n				#second argument for testFib
 	
@@ -47,8 +61,13 @@ main:
 	#------Print banner----------#
 	
 	li		$v0, 4				#
-	la		$a0, banner1		#Print first banner
+	la		$a0, banner2		#print second banner
 	syscall						#
+	
+	la		$a0, fibM			#first argument
+	lw		$a1, n				#second argument
+	
+	jal		testFib
 
 	li		$v0, 10				#exit
 	syscall			
@@ -109,6 +128,7 @@ testFib:
 	syscall
 	
 	lw		$ra, 20($sp)		#
+	addiu	$sp, $sp, 24
 	jr		$ra				
 
 
@@ -197,4 +217,73 @@ fibend:
 return1:
 	li		$v0, 1
 	j		fibend
+	
+#####################
+#		FibM		#
+#####################
+#
+#	int FibM(int n) {
+#		
+#		if(memo[n] != 0) {
+#			
+#			return memo[n];
+#		}
+#		
+#		else if(n < 2) {
+#			memo[n] = n;
+#		}
+#		
+#		else {
+#			memo[n] = fib(n-1) + fib(n-2);
+#		}
+#
+#	$t0 => i(memory counter)
+#	$t1 => n
+#	$t2 => fib(n-1)
+#
 
+fibM:
+	#------stack frame----#
+	addiu	$sp, $sp, -32		#push stack
+	sw		$ra, 16($sp)		#save ra
+	#---------------------#
+
+	mul		$t0, $a0, 4			#i = n * 4
+	
+	lw		$v0, memo($t0)		#memo[n]
+	
+	bnez	$v0, fibMclose		#if(memo[n] == 0)
+	
+	bge		$a0, 2, fibMelse	#if(n > 2) 
+	
+	sw		$v0, memo($t0)		#memo[n] = n
+	
+	j		fibMclose
+	
+fibMelse:
+		
+	sw		$t0, 20($sp)		#save i
+	sw		$a0, 24($sp)		#save n
+		
+	subi 	$a0, $a0, 1			#n-1
+		
+	jal		fibM				#fib(n-1)
+		
+	sw		$v0, 28($sp)		#save return
+		
+	lw		$a0, 24($sp)		#get n
+	subi	$a0, $a0, 2			#n - 2
+		
+	jal		fibM				#fib(n-2)
+	
+	lw		$t0, 20($sp) 		#get i
+	lw		$t2, 28($sp)		#get fib(n-1)
+	
+	add		$v0, $v0, $t2		#fib(n-1) + fib(n-2)
+	
+	sw		$v0, memo($t0)		#memo[n] = fib(n-1) + fib(n-2)
+
+fibMclose:
+	lw		$ra, 16($sp)		#get ra
+	addiu	$sp, $sp, 32		#pop stack
+	jr		$ra					#return
